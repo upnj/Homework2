@@ -1,0 +1,192 @@
+---
+title: "Programming in Basic R"
+format: html
+editor: visual
+---
+
+## Task 1: Basic Vector Practice
+
+1.1 Create the blood pressure vector before treatment.
+Suppose we have data from a medical experiment on blood pressure. We have the following pre-treatment
+values for subjects 1 through 20:
+
+```{r}
+pre_bp <- c(120, 151, 125, 126, 115, 132, 132, 129, 134, 139, 127, 122, 127, 135, 133, 128, 147, 138, 140, 132)
+pre_bp
+```
+Create the blood pressure vector after treatment. after treatment, the subject were measure again (subject 1 to 20 match)
+
+```{r}
+
+post_bp <- c(127, 145, 135, 122, 115, 122, 123, 126, 126, 129, 132, 146, 120, 114, 121, 120, 128, 120, 133, 115)
+post_bp
+```
+1.2 Assign names to the vector elements
+
+```{r}
+names(pre_bp) <- paste("Subject", 1:20, sep = "_")
+names(post_bp) <- paste("Subject", 1:20, sep="_")
+
+names(post_bp)
+```
+
+1.3 Calculate the change in blood pressure for each patient by subtracting post-treatment measurements
+from pre-treatment measurements. Recall that R does math element-wise! Save this calculation as a
+new object in R (also a vector).
+
+```{r}
+diff_bp <- pre_bp - post_bp
+diff_bp
+typeof(diff_bp)
+```
+1.4 Calculate the average decrease in blood pressure across all patients Using mean() function.
+
+```{r}
+avg_decrease <- mean(diff_bp)
+avg_decrease
+```
+1.5 Determine which patients experienced a decrease in blood pressure after treatment (a positive change). Use the which() function to just return the indices (and names) associated with this type of change.
+
+```{r}
+positive_change_indices <- which(diff_bp > 0)
+positive_change_indices
+
+# Note we can also use following code to just output the names
+#positive_change_names <- names(diff_bp)[positive_change_indices]
+#positive_change_names
+
+```
+1.6 Subset the vector of differences to only return those that have a positive change. (Note that you don’t need the which() function here. A Boolean used as an indexing vector returns only indices were a
+TRUE occurred.)
+
+```{r}
+positive_changes <- diff_bp[diff_bp > 0]
+positive_changes
+```
+1.7 Calculate the average decrease in blood pressure for those with a positive change
+
+```{r}
+avg_positive_decrease <- mean(positive_changes)
+
+avg_positive_decrease
+```
+## Task 2: Basic Data Frame practice
+
+Continue the previous example.
+
+2.1 Create a data frame object with four columns corresponding to your data above in Task 1: patient, pre_bp, post_bp, and diff_bp 
+
+```{r}
+bp_data <- data.frame(
+  patient = paste("Subject", 1:20, sep = "_"),
+  pre_bp = pre_bp,
+  post_bp = post_bp,
+  diff_bp = diff_bp
+)
+
+str(bp_data)
+```
+
+
+2.2 Return only rows of the data frame where the diff_bp column is negative. (Use [ or learn about the
+subset() function if you’d like. If you use [, don’t reference the original vector from the first part,
+access the column of the data frame to make your comparison with 0.)
+
+```{r}
+#[bp_data$diff_bp] will access the column diff_bp from data frame bp_data
+
+negative_changes <- bp_data[bp_data$diff_bp < 0, ]
+negative_changes
+```
+
+2.3 Add a new column to the data frame corresponding to TRUE if the post_bp is less than 120 and FALSE
+if it is not. Similar to the previous question, don’t reference the original vector from task 1, access the column of the data frame to make your comparison.
+Recall you can use $ to access a column. If you reference a column that doesn’t exist and save a
+vector (of appropriate length in it), that vector becomes a column of your data frame! Use this way of
+creating the new column.
+
+```{r}
+#Here new column (below_120bp) is created in the data frame bp_data
+bp_data$below_120bp <- ifelse(bp_data$post_bp < 120, TRUE, FALSE)
+bp_data
+```
+
+2.4 Print the data set
+
+```{r}
+knitr::kable(bp_data)
+```
+
+
+## Task 3: List Practice
+
+Continue the previous example. Suppose we now also have data from another experiment where the ‘treatment’ was actually a placebo.
+We have the following pre-treatment values for subjects 1 through 10 (different set of subjects):
+• 138, 135, 147, 117, 152, 134, 114, 121, 131, 130
+after treatment, the subjects were measured again (subjects 1 through 10 match)
+• 105, 136, 123, 130, 134, 143, 135, 139, 120, 124
+
+3.1: Create a new data frame with this data in it that is similar to the data frame from task 2  (including the new column of TRUE/FALSE values).
+```{r}
+# Pre-treatment BP values
+pre_bp_placebo <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+
+# Post-treatment BP values
+post_bp_placebo <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+
+#Create a new data frame with this data in it that is similar to the data frame from task 2 (including the new column of TRUE/FALSE values).
+
+placebo_df <- data.frame(
+  patient = 1:10,
+  pre_bp_placebo = pre_bp_placebo,
+  post_bp_placebo = post_bp_placebo,
+  diff_bp = pre_bp_placebo - post_bp_placebo,
+  below_120 = ifelse(post_bp < 120, TRUE, FALSE)
+)
+placebo_df
+
+```
+
+3.2: Now create and store a list with two elements:
+• 1nd element named treatment and contains the first data frame you created.
+• 2nd element named placebo and contains the second data frame you created.
+
+```{r}
+experiment_list <- list(
+  treatment = bp_data,
+  placebo = placebo_df
+)
+
+typeof(experiment_list)
+print(experiment_list)
+
+```
+
+3.3: Access the first list element using three different types of syntax
+
+```{r}
+# Method 1: Using the $ operator
+treatment_df_1 <- experiment_list$treatment
+
+# Method 2: Using double square brackets
+treatment_df_2 <- experiment_list[[1]]
+
+# Method 3: Using single square brackets (returns a list)
+treatment_list <- experiment_list["treatment"]
+treatment_df_3 <- treatment_list$treatment
+
+print(treatment_df_1)
+print(treatment_df_2)
+print(treatment_df_3)
+
+
+```
+3.4: Use your list from question 2. In one line of code, access the pre_bp column of the placebo data
+frame.
+
+```{r}
+experiment_list[[2]]$pre_bp_placebo
+
+```
+
+
